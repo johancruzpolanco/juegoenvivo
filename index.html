@@ -8,20 +8,15 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     
     <style>
-        /* -------------------------------------------------------------------------- */
-        /* ESTILOS BASE Y PARTICLES BACKGROUND                         */
-        /* -------------------------------------------------------------------------- */
-        
         :root {
             --bg-color: #0d1117;
-            --main-color: #e31837; /* Rojo Béisbol/LIDOM */
-            --parodiadera-color: #f7b731; /* Amarillo/Naranja de acento */
+            --main-color: #e31837;
+            --parodiadera-color: #f7b731;
             --text-color: #e6edf3;
             --card-bg: #161b22;
         }
 
         body {
-            /* Ajustes para el fondo de particles.js */
             min-height: 100vh;
             margin: 0;
             padding: 0; 
@@ -32,7 +27,6 @@
             align-items: center;
         }
 
-        /* Contenedor de partículas (el fondo) */
         #particles-js {
             position: fixed;
             top: 0;
@@ -43,7 +37,6 @@
             background-color: var(--bg-color);
         }
 
-        /* Contenedor principal del contenido (debe ir encima de las partículas) */
         #content-wrap {
             position: relative; 
             z-index: 1;
@@ -56,54 +49,14 @@
             align-items: center;
         }
 
-        h1 {
-            color: var(--main-color);
-            margin-bottom: 5px;
-            font-size: 2.2em;
-            text-align: center;
-        }
-        
-        .subtitle {
-            font-size: 1.1em;
-            color: var(--parodiadera-color);
-            margin-bottom: 25px;
-            font-weight: 500;
-            text-align: center;
-        }
-        
-        /* Aseguramos que el match-info sea negrita por defecto */
-        #match-info {
-            background-color: #000;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            text-align: center;
-            font-weight: bold; 
-        }
+        h1 { color: var(--main-color); margin-bottom: 5px; font-size: 2.2em; text-align: center; }
+        .subtitle { font-size: 1.1em; color: var(--parodiadera-color); margin-bottom: 25px; font-weight: 500; text-align: center; }
+        #match-info { background-color: #000; color: white; padding: 10px 20px; border-radius: 4px; margin-bottom: 15px; text-align: center; font-weight: bold; }
 
-        /* Contenedor principal para la lista y el reproductor */
-        #app-container {
-            display: flex;
-            width: 100%;
-            gap: 20px;
-            flex-direction: column;
-        }
+        #app-container { display: flex; width: 100%; gap: 20px; flex-direction: column; }
+        #player-panel { flex-grow: 3; order: 1; }
+        #list-panel { flex-grow: 1; order: 2; min-width: 280px; }
 
-        /* Panel del Reproductor */
-        #player-panel {
-            flex-grow: 3; 
-            order: 1;
-        }
-
-        /* Panel de la Lista de Streams */
-        #list-panel {
-            flex-grow: 1; 
-            order: 2;
-            min-width: 280px;
-        }
-
-        /* Estilo para la lista de Streams */
         #stream-list {
             list-style: none;
             padding: 0;
@@ -115,60 +68,16 @@
             overflow-y: auto;
         }
 
-        .stream-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid #21262d;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            display: flex;
-            align-items: center;
-        }
+        .stream-item { padding: 12px 15px; border-bottom: 1px solid #21262d; cursor: pointer; transition: background-color 0.2s ease; display: flex; align-items: center; }
+        .stream-item:hover { background-color: #21262d; }
+        .stream-item.active { background-color: var(--main-color); color: white; font-weight: bold; }
+        .stream-item-info { margin-left: 10px; }
+        .stream-item-info strong { display: block; font-size: 1.1em; }
 
-        .stream-item:hover {
-            background-color: #21262d;
-        }
-        
-        .stream-item.active {
-            background-color: var(--main-color);
-            color: white;
-            font-weight: bold;
-        }
+        #video-wrapper { position: relative; padding-top: 56.25%; height: 0; background-color: #000; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); }
+        #videoPlayer, #iframePlayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; border: none; }
 
-        .stream-item-info {
-            margin-left: 10px;
-        }
-        
-        .stream-item-info strong {
-            display: block;
-            font-size: 1.1em;
-        }
-
-        /* Truco para mantener la relación de aspecto 16:9 del video */
-        #video-wrapper {
-            position: relative;
-            padding-top: 56.25%; 
-            height: 0;
-            background-color: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        #videoPlayer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        
-        /* Media Query para PC */
-        @media (min-width: 768px) {
-            #app-container {
-                flex-direction: row; 
-            }
-        }
+        @media (min-width: 768px) { #app-container { flex-direction: row; } }
     </style>
 </head>
 <body>
@@ -176,252 +85,134 @@
 <div id="particles-js"></div>
 
 <div id="content-wrap">
-
     <h1>📺 CANAL 7 🍋‍🟩</h1>
     <p class="subtitle">Presenta: LIDOM en vivo. ¡Problemas en el Canal 7!</p>
 
     <div id="app-container">
-        
         <div id="list-panel">
-            <div id="match-info">
-                Cargando Luna TV por defecto. Selecciona un canal de la lista.
-            </div>
-            <ul id="stream-list">
-                </ul>
+            <div id="match-info">Cargando Luna TV por defecto. Selecciona un canal de la lista.</div>
+            <ul id="stream-list"></ul>
         </div>
-        
+
         <div id="player-panel">
             <div id="video-wrapper">
                 <video id="videoPlayer" controls autoplay muted></video>
+                <iframe id="iframePlayer" style="display:none;"></iframe>
             </div>
             <p style="text-align: center; margin-top: 10px; color: #8b949e;">
                 ⚠️ El video inicia silenciado. ¡Si no se ve, llámale a <strong>Hadid vividor</strong>! 🎸<br>
                 Para soporte técnico, contactar a <strong>Pizza Jo</strong>.
             </p>
         </div>
-
     </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
 <script>
-    // LISTADO DE STREAMS FILTRADOS (Solo los que tienen URL)
-    const STREAM_LINKS = {
-        "Digital 15": "http://181.188.216.5:18000/play/a0aw/index.m3u8",
-        "Teleuniverso Canal 29": "https://videoserver.tmcreativos.com:19360/kptjeckkaa/kptjeckkaa.m3u8",
-        "CDN Deportes": "http://200.125.170.122:8000/play/a03j/index.m3u8",
-        "Luna TV": "https://tv.wracanal10.com:3671/live/lunatvcanal53live.m3u8", 
-        "Teleantillas": "http://181.189.244.252:8000/play/a00x/index.m3u8",
-    };
+const STREAM_LINKS = {
+    "Digital 15": "iframe", // Marcamos para iframe
+    "Teleuniverso Canal 29": "https://videoserver.tmcreativos.com:19360/kptjeckkaa/kptjeckkaa.m3u8",
+    "Luna TV": "https://tv.wracanal10.com:3671/live/lunatvcanal53live.m3u8"
+};
 
-    // Estructura de Partidos (Priorizando Águilas Cibaeñas)
-    const PARTIDOS = [
-        {
-            equipo1: "Gigantes del Cibao", equipo2: "Aguilas Cibaeñas",
-            estadio: "Estadio Cibao (Santiago)",
-            canales: ["Teleuniverso Canal 29", "CDN Deportes", "Luna TV"] 
-        },
-        {
-            equipo1: "Leones del Escogido", equipo2: "Tigres del Licey",
-            estadio: "Estadio Quisqueya (SD)",
-            canales: ["Digital 15"]
-        },
-        {
-            equipo1: "Toros del Este", equipo2: "Estrellas Orientales",
-            estadio: "Estadio Tetelo Vargas (SPM)",
-            canales: ["Teleantillas"]
-        }
-    ];
-    
-    const video = document.getElementById('videoPlayer');
-    const streamListContainer = document.getElementById('stream-list');
-    const matchInfo = document.getElementById('match-info');
-    let hlsInstance = null; 
-    
-    const DEFAULT_CHANNEL_NAME = "Luna TV";
+const PARTIDOS = [
+    { equipo1: "Gigantes del Cibao", equipo2: "Aguilas Cibaeñas", estadio: "Estadio Cibao (Santiago)", canales: ["Teleuniverso Canal 29", "CDN Deportes", "Luna TV"] },
+    { equipo1: "Leones del Escogido", equipo2: "Tigres del Licey", estadio: "Estadio Quisqueya (SD)", canales: ["Digital 15"] }
+];
 
-    function stopPlayer() {
-        video.pause();
-        if (hlsInstance) {
-            hlsInstance.destroy();
-            hlsInstance = null;
-        }
-        video.src = '';
-    }
+const video = document.getElementById('videoPlayer');
+const iframe = document.getElementById('iframePlayer');
+const streamListContainer = document.getElementById('stream-list');
+const matchInfo = document.getElementById('match-info');
+let hlsInstance = null;
+const DEFAULT_CHANNEL_NAME = "Luna TV";
 
-    // Función principal para cargar un stream
-    function loadStream(streamUrl, channelName, element) {
-        if (!streamUrl) {
-            matchInfo.innerHTML = `⚠️ ${channelName}: Enlace HLS no disponible.`;
-            stopPlayer();
-            return;
-        }
-        
-        stopPlayer(); 
+function stopPlayer() {
+    video.pause();
+    video.style.display = 'block';
+    iframe.style.display = 'none';
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    video.src = '';
+    iframe.src = '';
+}
 
-        document.querySelectorAll('.stream-item').forEach(item => {
-            item.classList.remove('active');
+function loadStream(streamUrl, channelName, element) {
+    stopPlayer();
+    document.querySelectorAll('.stream-item').forEach(item => item.classList.remove('active'));
+    if (element) element.classList.add('active');
+    matchInfo.innerHTML = `Reproduciendo: <strong>${channelName}</strong>`;
+
+    if (streamUrl === "iframe") {
+        video.style.display = 'none';
+        iframe.style.display = 'block';
+        iframe.src = "https://telemicro.com.do/players/15tv/";
+    } else if (Hls.isSupported()) {
+        hlsInstance = new Hls();
+        hlsInstance.loadSource(streamUrl);
+        hlsInstance.attachMedia(video);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(()=>{}));
+        hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+                matchInfo.innerHTML = `❌ <strong>Error Fatal en ${channelName}</strong>: Intenta con otro canal.`;
+                if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hlsInstance.startLoad();
+                else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hlsInstance.recoverMediaError();
+            }
         });
-        if (element) {
-            element.classList.add('active');
-        }
-
-        // --- ARREGLO NEGRITA: Usando <strong> dentro del innerHTML ---
-        matchInfo.innerHTML = `Reproduciendo: <strong>${channelName}</strong>`;
-
-        if (Hls.isSupported()) {
-            hlsInstance = new Hls();
-            hlsInstance.loadSource(streamUrl);
-            hlsInstance.attachMedia(video);
-            
-            hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play().catch(error => {
-                    console.warn('Autoplay falló, el usuario debe interactuar:', error);
-                });
-            });
-
-            hlsInstance.on(Hls.Events.ERROR, function (event, data) {
-                if (data.fatal) {
-                    console.error('Error HLS fatal:', data);
-                    // --- ARREGLO NEGRITA: Usando <strong> en error ---
-                    matchInfo.innerHTML = `❌ <strong>Error Fatal en ${channelName}</strong>: Intenta con otro canal.`;
-                    if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                        hlsInstance.startLoad();
-                    } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-                        hlsInstance.recoverMediaError();
-                    }
-                }
-            });
-            
-        } 
-        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = streamUrl;
-            video.addEventListener('loadedmetadata', function() {
-                video.play().catch(error => {
-                    console.warn('Autoplay nativo falló, el usuario debe interactuar:', error);
-                });
-            }, { once: true });
-        } else {
-            matchInfo.innerHTML = '❌ ERROR: Tu navegador no soporta la reproducción de este stream HLS.';
-        }
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = streamUrl;
+        video.addEventListener('loadedmetadata', () => video.play().catch(()=>{}), { once:true });
+    } else {
+        matchInfo.innerHTML = '❌ ERROR: Tu navegador no soporta la reproducción de este stream HLS.';
     }
+}
 
-    // Función para construir la lista de streams y partidos
-    function buildStreamList() {
-        let defaultElementToHighlight = null;
+function buildStreamList() {
+    let defaultElementToHighlight = null;
+    PARTIDOS.forEach(partido => {
+        const partidoTitle = document.createElement('li');
+        partidoTitle.className = 'stream-item';
+        partidoTitle.style.backgroundColor = '#21262d';
+        partidoTitle.style.cursor = 'default';
+        partidoTitle.style.color = 'var(--text-color)';
+        partidoTitle.innerHTML = `<div class="stream-item-info" style="margin-left: 0;"><strong>${partido.equipo1} vs. ${partido.equipo2}</strong><span style="font-size:0.9em;">📍 ${partido.estadio}</span></div>`;
+        streamListContainer.appendChild(partidoTitle);
 
-        PARTIDOS.forEach(partido => {
-            const partidoTitle = document.createElement('li');
-            partidoTitle.className = 'stream-item';
-            partidoTitle.style.backgroundColor = '#21262d';
-            partidoTitle.style.cursor = 'default';
-            partidoTitle.style.color = 'var(--text-color)';
-            partidoTitle.innerHTML = `
-                <div class="stream-item-info" style="margin-left: 0;">
-                    <strong>${partido.equipo1} vs. ${partido.equipo2}</strong>
-                    <span style="font-size: 0.9em;">📍 ${partido.estadio}</span>
-                </div>
-            `;
-            streamListContainer.appendChild(partidoTitle);
-
-            partido.canales.forEach(canal => {
-                const streamUrl = STREAM_LINKS[canal];
-                
-                if (!streamUrl) return; 
-
-                const listItem = document.createElement('li');
-                listItem.className = 'stream-item';
-                
-                let icon = '&#x25b6;'; 
-                let description = 'Haga clic para ver';
-
-                listItem.innerHTML = `
-                    <span style="font-size: 1.5em; color: var(--main-color);">${icon}</span>
-                    <div class="stream-item-info">
-                        <strong>${canal}</strong>
-                        <span>${description}</span>
-                    </div>
-                `;
-                
-                listItem.addEventListener('click', () => {
-                    loadStream(streamUrl, canal, listItem);
-                });
-                
-                streamListContainer.appendChild(listItem);
-                
-                if (canal === DEFAULT_CHANNEL_NAME) {
-                    defaultElementToHighlight = listItem;
-                }
-            });
+        partido.canales.forEach(canal => {
+            const streamUrl = STREAM_LINKS[canal];
+            if (!streamUrl) return;
+            const listItem = document.createElement('li');
+            listItem.className = 'stream-item';
+            listItem.innerHTML = `<span style="font-size:1.5em;color:var(--main-color);">&#x25b6;</span><div class="stream-item-info"><strong>${canal}</strong><span>Haga clic para ver</span></div>`;
+            listItem.addEventListener('click', () => loadStream(streamUrl, canal, listItem));
+            streamListContainer.appendChild(listItem);
+            if (canal === DEFAULT_CHANNEL_NAME) defaultElementToHighlight = listItem;
         });
-        
-        // Cargar el canal por defecto (Luna TV) y corregir el texto inicial
-        const defaultUrl = STREAM_LINKS[DEFAULT_CHANNEL_NAME];
-        if (defaultUrl) {
-             // --- ARREGLO NEGRITA: Usando <strong> en carga inicial ---
-             matchInfo.innerHTML = `Cargando <strong>${DEFAULT_CHANNEL_NAME}</strong> por defecto. Selecciona un canal de la lista.`;
-             
-             setTimeout(() => {
-                 loadStream(defaultUrl, DEFAULT_CHANNEL_NAME, defaultElementToHighlight);
-             }, 100);
-        }
-    }
-
-    // Inicializar la aplicación y Particles.js al cargar la página
-    document.addEventListener('DOMContentLoaded', () => {
-        buildStreamList();
-        
-        // --- PARTICLE.JS INITIALIZATION ---
-        particlesJS('particles-js', {
-            "particles": {
-                "number": {
-                    "value": 80,
-                    "density": { "enable": true, "value_area": 800 }
-                },
-                "color": { "value": ["#e31837", "#f7b731", "#e6edf3"] },
-                "shape": { "type": "circle" },
-                "opacity": {
-                    "value": 0.5,
-                    "random": false,
-                    "anim": { "enable": false }
-                },
-                "size": {
-                    "value": 3,
-                    "random": true,
-                    "anim": { "enable": false }
-                },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#21262d", 
-                    "opacity": 0.4,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 6,
-                    "direction": "none",
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false,
-                    "attract": { "enable": false }
-                }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": { "enable": true, "mode": "repulse" },
-                    "onclick": { "enable": true, "mode": "push" },
-                    "resize": true
-                }
-            },
-            "retina_detect": true
-        });
-        // --- END PARTICLE.JS INITIALIZATION ---
     });
+
+    const defaultUrl = STREAM_LINKS[DEFAULT_CHANNEL_NAME];
+    if (defaultUrl) {
+        matchInfo.innerHTML = `Cargando <strong>${DEFAULT_CHANNEL_NAME}</strong> por defecto. Selecciona un canal de la lista.`;
+        setTimeout(() => loadStream(defaultUrl, DEFAULT_CHANNEL_NAME, defaultElementToHighlight), 100);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    buildStreamList();
+    particlesJS('particles-js', {
+        "particles": {
+            "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+            "color": { "value": ["#e31837","#f7b731","#e6edf3"] },
+            "shape": { "type":"circle" },
+            "opacity": { "value":0.5 },
+            "size": { "value":3,"random":true },
+            "line_linked": { "enable":true,"distance":150,"color":"#21262d","opacity":0.4,"width":1 },
+            "move": { "enable":true,"speed":6,"direction":"none","random":false,"straight":false,"out_mode":"out","bounce":false }
+        },
+        "interactivity": { "detect_on":"canvas", "events": { "onhover":{"enable":true,"mode":"repulse"}, "onclick":{"enable":true,"mode":"push"}, "resize":true } },
+        "retina_detect": true
+    });
+});
 </script>
 
 </body>
